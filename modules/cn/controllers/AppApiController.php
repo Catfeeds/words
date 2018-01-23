@@ -69,9 +69,6 @@ class AppApiController extends ApiController {
             if($nickname != $data['nickname']){
                 User::updateAll(['nickname' => "$nickname"],"uid=$uid");
             }
-            if($data['roleId'] == ''){
-                User::updateAll(['roleId' => 4],"uid=$uid");
-            }
         }
         $session->set('uid', $uid);
     }

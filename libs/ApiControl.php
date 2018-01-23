@@ -6,8 +6,9 @@
 	namespace app\libs;
     use yii;
     use yii\web\Controller;
-    use app\modules\basic\models\Params;
 	class ApiControl extends Controller {
-
+        public function init() {
+         var_dump(1111);die;
+        }
 	}
 ?>

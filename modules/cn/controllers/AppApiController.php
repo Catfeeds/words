@@ -50,8 +50,7 @@ class AppApiController extends ApiController {
             $login->nickname = $nickname;
 
             $login->uid = $uid;
-
-            $login->roleId = 4;
+            
             $login->save();
         }else{
             if($phone != $data['phone']){

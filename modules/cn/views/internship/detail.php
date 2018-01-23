@@ -1,0 +1,115 @@
+
+    <link rel="stylesheet" href="/cn/css/bootstrap.css"/>
+    <link rel="stylesheet" href="/cn/css/studyingPublic.css"/>
+    <link rel="stylesheet" href="/cn/css/caseLib-public.css"/>
+    <link rel="stylesheet" href="/cn/css/case-threeL.css"/>
+    <script type="text/javascript" src="/cn/js/bootstrap.js"></script>
+<!------------另一种导航------------------>
+<div style="clear: both"></div>
+<div class="container">
+<div class="row">
+<div class="col-md-9">
+    <div class="commonLeft">
+        <div class="subNav">
+            <ul>
+                <li>
+                    <a href="#">留学商城</a>
+                    &gt;
+                    <a href="/cn/project.html">背景提升项目</a>
+                    &gt;
+                    <a href="#"><?php echo isset($class['name'])?$class['name']:'' ?></a>
+                    &gt;
+                    <a href="#">正文</a>
+                </li>
+            </ul>
+        </div>
+        <div class="threeTitle">
+            <h1><?php echo $data[0]['title']?></h1>
+            <span>上传时间：<?php echo $data[0]['alternatives']?></span>
+        </div>
+        <div class="threeContent">
+            <?php echo $data[0]['answer']?>
+        </div>
+    </div>
+</div>
+<div class="col-md-3">
+    <div class="univer-right">
+        <div class="common-title">
+            热门案例
+        </div>
+        <div class="greyDiv">
+            <div style="clear: both"></div>
+            <div class="greyB-ul">
+                <ul>
+                    <?php
+                    $data = \app\modules\cn\models\Content::getClass(['fields' => 'answer','category' => '281','page'=>1,'pageSize' => 30]);
+                    foreach($data as $v) {
+                        ?>
+                        <li>
+                            <i>•</i>
+                            <a href="/cn/case/281-<?php echo $v['id']?>.html"><?php echo $v['name'] ?></a>
+                        </li>
+                        <?php
+                    }
+                    ?>
+                </ul>
+            </div>
+        </div>
+
+<!--        <div class="common-title">-->
+<!--            录取捷报-->
+<!--        </div>-->
+<!--        <div class="report">-->
+<!--            <ul>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span class="orange">奖</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <span>录</span>-->
+<!--                    <a href="#">[牛津大学]&nbsp;&nbsp;&nbsp;&nbsp;[mmxe1990]</a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </div>-->
+
+    </div>
+</div>
+<div class="clearMB"></div>
+</div>
+</div>

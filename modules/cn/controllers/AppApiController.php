@@ -7,17 +7,36 @@
 namespace app\modules\cn\controllers;
 use app\libs\ApiController;
 use app\modules\cn\models\User;
+use app\modules\cn\models\UserPackage;
+use app\modules\cn\models\Words;
 use yii;
 
 
 class AppApiController extends ApiController {
     public $enableCsrfValidation = false;
     /**
-     * 留学首页
+     * 获取用户资料
      * @Obelisk
      */
-    public function actionIndex(){
-
+    public function actionUserInfo(){
+        $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $re = User::find()->asArray()->where("uid=$uid")->one();
+        if($re){
+            $re = [
+                'code' => 1,
+                'message' => '获取成功',
+                'data' => $re
+            ];
+        }else{
+            $re = [
+                'code' => 0,
+                'message' => '无效用户'
+            ];
+        }
+        die(json_encode($re));
 
     }
 
@@ -50,7 +69,7 @@ class AppApiController extends ApiController {
             $login->nickname = $nickname;
 
             $login->uid = $uid;
-            
+
             $login->save();
         }else{
             if($phone != $data['phone']){
@@ -71,6 +90,84 @@ class AppApiController extends ApiController {
         }
         $session->set('uid', $uid);
     }
+
+
+    /**
+     * 修改记忆模式
+     * @Obelisk
+     */
+    public function actionUpdateModel(){
+        $uid = Yii::$app->session->get('uid');
+        $status = Yii::$app->request->post('status');
+        $re = User::updateAll(['studyModel' => $status],"uid=$uid");
+        if($re){
+            $re = [
+                'code' => 1,
+                'message' => '修改成功'
+            ];
+        }else{
+            $re = [
+                'code' => 0,
+                'message' => '修改失败'
+            ];
+        }
+        die(json_encode($re));
+    }
+
+    
+
+    /**
+     * 用户计划词包
+     * @Obelisk
+     */
+    public function actionUserPackage(){
+        $uid = Yii::$app->session->get('uid');
+        $package = UserPackage::find()->asArray()->where("uid=$uid")->all();
+        foreach($package as $k => $v){
+            $total = Words::find()->where("categoryId={$v['id']}")->count();
+            $package[$k]['total'] = $total;
+            $userWords = Words::find()->where("catId={$v['id']} AND uid=$uid")->count();
+            $package[$k]['userWords'] = $userWords;
+        }
+        die(json_encode(['package' => $package]));
+    }
+
+    /**
+     * 词包列表
+     * @Obelisk
+     */
+    public function actionPackageList(){
+        $uid = Yii::$app->session->get('uid');
+        $package = UserPackage::find()->asArray()->where('pid=0')->all();
+        foreach($package as $k => $v){
+            $child = UserPackage::find()->asArray()->where("pid={$v['id']}")->all();
+            foreach($child as $key => $val){
+                $total = Words::find()->where("categoryId={$val['id']}")->count();
+                $child[$key]['total'] = $total;
+                $userWords = Words::find()->where("catId={$val['id']} AND uid=$uid")->count();
+                $child[$key]['userWords'] = $userWords;
+            }
+            $package[$k]['child'] = $child;
+        }
+        die(json_encode(['package' => $package]));
+    }
+
+    /**
+     * 添加词包
+     * @Obelisk
+     */
+    public function actionAddPackage(){
+        $uid = Yii::$app->session->get('uid');
+        $packageId = Yii::$app->request->post('packageId');
+        $planDay = Yii::$app->request->post('planDay');
+        $planWords = Yii::$app->request->post('planWords');
+        $model = new UserPackage();
+        $model->uid;
+
+
+    }
+
+
 
 
 }

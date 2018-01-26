@@ -114,7 +114,7 @@ class AppApiController extends ApiController {
         die(json_encode($re));
     }
 
-    
+
 
     /**
      * 用户计划词包
@@ -162,9 +162,23 @@ class AppApiController extends ApiController {
         $planDay = Yii::$app->request->post('planDay');
         $planWords = Yii::$app->request->post('planWords');
         $model = new UserPackage();
-        $model->uid;
-
-
+        $model->uid = $uid;
+        $model->catId = $packageId;
+        $model->planDay = $planDay;
+        $model->planWords = $planWords;
+        $re = $model->save();
+        if($re){
+            $re = [
+                'code' => 1,
+                'message' => '添加成功'
+            ];
+        }else{
+            $re = [
+                'code' => 0,
+                'message' => '添加失败'
+            ];
+        }
+        die(json_encode($re));
     }
 
 

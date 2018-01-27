@@ -98,6 +98,9 @@ class AppApiController extends ApiController {
      */
     public function actionUpdateModel(){
         $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
         $status = Yii::$app->request->post('status');
         $re = User::updateAll(['studyModel' => $status],"uid=$uid");
         if($re){
@@ -122,6 +125,9 @@ class AppApiController extends ApiController {
      */
     public function actionUserPackage(){
         $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
         $package = UserPackage::find()->asArray()->where("uid=$uid")->all();
         foreach($package as $k => $v){
             $total = Words::find()->where("categoryId={$v['id']}")->count();
@@ -138,6 +144,9 @@ class AppApiController extends ApiController {
      */
     public function actionPackageList(){
         $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
         $package = UserPackage::find()->asArray()->where('pid=0')->all();
         foreach($package as $k => $v){
             $child = UserPackage::find()->asArray()->where("pid={$v['id']}")->all();
@@ -158,6 +167,9 @@ class AppApiController extends ApiController {
      */
     public function actionAddPackage(){
         $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
         $packageId = Yii::$app->request->post('packageId');
         $planDay = Yii::$app->request->post('planDay');
         $planWords = Yii::$app->request->post('planWords');

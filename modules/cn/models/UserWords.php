@@ -11,7 +11,7 @@ class UserWords extends ActiveRecord {
     }
 
     public function getUserPackageNum($catId,$uid){
-        $sql = "select uw.id from {{%user_words}} uw LEFT JOIN {{%words}} w ON uw.wordsId=w.id WHERE w.catId=$catId AND uw.uid=$uid";
+        $sql = "select uw.id from {{%user_words}} uw LEFT JOIN {{%words}} w ON uw.wordsId=w.id WHERE w.categoryId=$catId AND uw.uid=$uid";
         $data = \Yii::$app->db->createCommand($sql)->queryAll();
         if($data){
             $num = count($data);

@@ -6,6 +6,7 @@
  */
 namespace app\modules\cn\controllers;
 use app\libs\ApiController;
+use app\modules\cn\models\Category;
 use app\modules\cn\models\User;
 use app\modules\cn\models\UserPackage;
 use app\modules\cn\models\UserWords;
@@ -148,13 +149,13 @@ class AppApiController extends ApiController {
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
-        $package = UserPackage::find()->asArray()->where('pid=0')->all();
+        $package = Category::find()->asArray()->where('pid=0')->all();
         foreach($package as $k => $v){
-            $child = UserPackage::find()->asArray()->where("pid={$v['id']}")->all();
+            $child = Category::find()->asArray()->where("pid={$v['id']}")->all();
             foreach($child as $key => $val){
                 $total = Words::find()->where("categoryId={$val['id']}")->count();
                 $child[$key]['total'] = $total;
-                $userWords = Words::find()->where("catId={$val['id']} AND uid=$uid")->count();
+                $userWords = UserWords::find()->where("catId={$val['id']} AND uid=$uid")->count();
                 $child[$key]['userWords'] = $userWords;
             }
             $package[$k]['child'] = $child;

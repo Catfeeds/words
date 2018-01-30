@@ -132,10 +132,11 @@ class AppApiController extends ApiController {
         }
         $package = UserPackage::find()->asArray()->where("uid=$uid")->all();
         foreach($package as $k => $v){
-            $total = Words::find()->where("categoryId={$v['id']}")->count();
+            $total = Words::find()->where("categoryId={$v['catId']}")->count();
             $package[$k]['total'] = $total;
-            $userWords = UserWords::find()->where("catId={$v['id']} AND uid=$uid")->count();
-            $package[$k]['userWords'] = $userWords;
+            $model = new UserWords();
+            $num = $model->getUserPackageNum($v['catId'],$uid);
+            $package[$k]['userWords'] = $num;
         }
         die(json_encode(['package' => $package]));
     }
@@ -155,8 +156,9 @@ class AppApiController extends ApiController {
             foreach($child as $key => $val){
                 $total = Words::find()->where("categoryId={$val['id']}")->count();
                 $child[$key]['total'] = $total;
-                $userWords = UserWords::find()->where("catId={$val['id']} AND uid=$uid")->count();
-                $child[$key]['userWords'] = $userWords;
+                $model = new UserWords();
+                $num = $model->getUserPackageNum($v['id'],$uid);
+                $child[$key]['userWords'] = $num;
             }
             $package[$k]['child'] = $child;
         }

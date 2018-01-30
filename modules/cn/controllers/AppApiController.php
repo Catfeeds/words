@@ -8,6 +8,7 @@ namespace app\modules\cn\controllers;
 use app\libs\ApiController;
 use app\modules\cn\models\User;
 use app\modules\cn\models\UserPackage;
+use app\modules\cn\models\UserWords;
 use app\modules\cn\models\Words;
 use yii;
 
@@ -132,7 +133,7 @@ class AppApiController extends ApiController {
         foreach($package as $k => $v){
             $total = Words::find()->where("categoryId={$v['id']}")->count();
             $package[$k]['total'] = $total;
-            $userWords = Words::find()->where("catId={$v['id']} AND uid=$uid")->count();
+            $userWords = UserWords::find()->where("catId={$v['id']} AND uid=$uid")->count();
             $package[$k]['userWords'] = $userWords;
         }
         die(json_encode(['package' => $package]));
@@ -148,6 +149,30 @@ class AppApiController extends ApiController {
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
         $package = UserPackage::find()->asArray()->where('pid=0')->all();
+        foreach($package as $k => $v){
+            $child = UserPackage::find()->asArray()->where("pid={$v['id']}")->all();
+            foreach($child as $key => $val){
+                $total = Words::find()->where("categoryId={$val['id']}")->count();
+                $child[$key]['total'] = $total;
+                $userWords = Words::find()->where("catId={$val['id']} AND uid=$uid")->count();
+                $child[$key]['userWords'] = $userWords;
+            }
+            $package[$k]['child'] = $child;
+        }
+        die(json_encode(['package' => $package]));
+    }
+
+    /**
+     * 词包详情
+     * @Obelisk
+     */
+    public function actionPackageDetails(){
+        $uid = Yii::$app->session->get('uid');
+        $catId = Yii::$app->session->get('catId');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $package = Words::find()->asArray()->where('catId')->all();
         foreach($package as $k => $v){
             $child = UserPackage::find()->asArray()->where("pid={$v['id']}")->all();
             foreach($child as $key => $val){

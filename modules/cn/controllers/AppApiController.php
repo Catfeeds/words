@@ -11,6 +11,8 @@ use app\modules\cn\models\User;
 use app\modules\cn\models\UserPackage;
 use app\modules\cn\models\UserWords;
 use app\modules\cn\models\Words;
+use app\modules\cn\models\WordsLowSentence;
+use app\modules\cn\models\WordsSentence;
 use yii;
 
 
@@ -234,6 +236,106 @@ class AppApiController extends ApiController {
         }
         die(json_encode($re));
     }
+
+    /**
+     * 获取单词
+     * @Obelisk
+     */
+    public function actionReciteWords(){
+        $uid = Yii::$app->session->get('uid');
+        $isMemory = Yii::$app->session->get('isMemory');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $sign = User::find($uid);
+        if($sign->studyModel == 1 && $isMemory){
+            $re = $this->verifyMemory($uid);
+            if($re){
+                die(json_encode(['code' => 98,'message' => '进入复习了']));
+            }
+        }
+        $packageId = $sign->nowPackage;
+        $model = new UserWords();
+        $wordsId = $model->lastWords($packageId,$uid);
+        $words = Words::find()->asArray()->where("categoryId=$packageId AND id>$wordsId")->orderBy("id ASC")->one();
+        if(!$words){
+            die(json_encode(['code' => 2,'message' => '没有单词了']));
+        }
+        $sentence = WordsSentence::find()->asArray()->where("wordsId={$words['id']}")->all();
+        $lowSentence = WordsLowSentence::find()->asArray()->where("wordsId={$words['id']}")->all();
+        Yii::$app->session->remove('isMemory');
+        die(json_encode(['code' => 1,'message' => '成功','words' => $words,'sentence' => $sentence,'lowSentence' => $lowSentence]));
+    }
+
+    /**
+     * 修改状态
+     * @Obelisk
+     */
+    public function actionUpdateStatus(){
+        $uid = Yii::$app->session->get('uid');
+        $wordsId = Yii::$app->request->post('wordsId');
+        $status = Yii::$app->request->post('status');
+        $time = time();
+        $day = date("Y-m-d");
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $re = UserWords::find()->where("wordsId=$wordsId AND uid=$uid")->one();
+        if($re){
+            if($status == 1){
+                $isKnow = 1;
+            }else{
+                $isKnow = 0;
+            }
+            $re = UserWords::updateAll(['lastStatus' => $status,'updateTime' => $time,'updateDay' => $day,'isKnow' => $isKnow],"id=$re->id");
+        }else{
+            $model = new UserWords();
+            $model->wordsId = $wordsId;
+            $model->uid = $uid;
+            $model->lastStatus = $status;
+            $model->firstStatus = $status;
+            $model->createTime = $time;
+            $model->updateTime = $time;
+            $model->createDay = $day;
+            $model->updateDay = $day;
+            if($status == 1){
+                $model->isKonw = 1;
+            }else{
+                $model->isKonw = 0;
+            }
+            $re = $model->save();
+
+        }
+        Yii::$app->session->set('isMemory',1);
+        if($re){
+            $re = [
+                'code' => 1,
+                'message' => '保存成功'
+            ];
+        }else{
+            $re = [
+                'code' => 0,
+                'message' => '保存失败'
+            ];
+        }
+        die(json_encode($re));
+    }
+
+    /**
+     * 验证
+     * @param $uid
+     * @Obelisk
+     */
+    public function verifyMemory($uid){
+        $str = date("Y-m-d");
+        $num = UserWords::find()->asArray("createDay='$str' AND uid=$uid")->count();
+        if($num == 5 || $num%25==0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
 
 
 

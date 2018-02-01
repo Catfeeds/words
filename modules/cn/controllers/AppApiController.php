@@ -174,11 +174,13 @@ class AppApiController extends ApiController {
     public function actionPackageDetails(){
         $uid = Yii::$app->session->get('uid');
         $catId = Yii::$app->request->post('catId');
+        $page = Yii::$app->request->post('page',1);
+        $pageSize = Yii::$app->request->post('pageSize',20);
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
         $model = new Words();
-        $packageDetails = $model->packageDetails($catId,$uid);
+        $packageDetails = $model->packageDetails($catId,$uid,$page,$pageSize);
         die(json_encode(['packageDetails' => $packageDetails]));
     }
 

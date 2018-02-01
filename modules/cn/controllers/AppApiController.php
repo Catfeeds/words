@@ -240,7 +240,7 @@ class AppApiController extends ApiController {
     }
 
     /**
-     * 获取单词
+     * 背单词
      * @Obelisk
      */
     public function actionReciteWords(){
@@ -265,8 +265,15 @@ class AppApiController extends ApiController {
         }
         $sentence = WordsSentence::find()->asArray()->where("wordsId={$words['id']}")->all();
         $lowSentence = WordsLowSentence::find()->asArray()->where("wordsId={$words['id']}")->all();
+        $re = file_get_contents("http://gmatonline.cc/index.php?web/webapi/getWordsQuestion&words={$words['word']}");
+        $re = json_decode($re,true);
+        if($re['code'] == 1){
+            $question = $re['question'];
+        }else{
+            $question = false;
+        }
         Yii::$app->session->remove('isMemory');
-        die(json_encode(['code' => 1,'message' => '成功','words' => $words,'sentence' => $sentence,'lowSentence' => $lowSentence]));
+        die(json_encode(['code' => 1,'message' => '成功','words' => $words,'sentence' => $sentence,'lowSentence' => $lowSentence,'question' => $question]));
     }
 
     /**

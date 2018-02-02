@@ -197,6 +197,10 @@ class AppApiController extends ApiController {
         }
         $sign = User::find($uid);
         $packageId = Yii::$app->request->post('packageId');
+        $sign1 = UserPackage::find()->where("catId=$packageId AND uid=$uid")->one();
+        if($sign1){
+            die(json_encode(['code' => 0,'message' => '该词包已添加']));
+        }
         $model = new UserPackage();
         $model->uid = $uid;
         $model->catId = $packageId;

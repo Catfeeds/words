@@ -139,6 +139,8 @@ class AppApiController extends ApiController {
             $model = new UserWords();
             $num = $model->getUserPackageNum($v['catId'],$uid);
             $package[$k]['userWords'] = $num;
+            $sign = Category::find()->where("id={$v['catId']}")->one();
+            $package[$k]['userWords'] = $sign->name;
         }
         die(json_encode(['package' => $package]));
     }
@@ -193,12 +195,16 @@ class AppApiController extends ApiController {
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
+        $sign = User::find($uid);
         $packageId = Yii::$app->request->post('packageId');
         $model = new UserPackage();
         $model->uid = $uid;
         $model->catId = $packageId;
         $re = $model->save();
         if($re){
+            if(!$sign->nowPackage){
+                User::updateAll(['nowPackage' => $packageId],"uid=$uid");
+            }
             $re = [
                 'code' => 1,
                 'message' => '添加成功'
@@ -213,30 +219,52 @@ class AppApiController extends ApiController {
     }
 
     /**
-     * 修改翅膀计划
+     * 删除词包计划
      * @Obelisk
      */
-    public function actionUpdatePackage(){
+    public function actionDeletePackage(){
         $uid = Yii::$app->session->get('uid');
-        $userPackageId = Yii::$app->request->post('userPackageId');
-        $planDay = Yii::$app->request->post('planDay');
-        $planWords = Yii::$app->request->post('planWords');
+        $id = Yii::$app->request->post('id');
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
-        $re = UserPackage::updateAll(['planDay'=>$planDay,'planWords'=>$planWords],"id=$userPackageId");
+        $sign = UserPackage::findOne($id);
+        $sign1 = User::findOne($uid);
+        $re = UserPackage::deleteAll("id=$id");
+        if($sign->catId == $sign1->nowPackage){
+            $sign = UserPackage::find()->orderBy('id ASC')->one();
+            if($sign){
+                User::updateAll(['nowPackage' => $sign->catId],"uid=$uid");
+            }
+        }
         if($re){
             $re = [
                 'code' => 1,
-                'message' => '修改成功'
+                'message' => '删除成功'
             ];
         }else{
             $re = [
                 'code' => 0,
-                'message' => '修改失败'
+                'message' => '删除成功'
             ];
         }
         die(json_encode($re));
+    }
+
+    /**
+     * 修改词包计划
+     * @Obelisk
+     */
+    public function actionUpdatePackage(){
+        $uid = Yii::$app->session->get('uid');
+        $data = Yii::$app->request->post('data');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        foreach($data as $v){
+            UserPackage::updateAll(['planDay'=>$v['planDay'],'planWords'=>$v['planWords']],"id={$v['id']}");
+        }
+        die(json_encode(['code' => 1,'message' => '成功']));
     }
 
     /**

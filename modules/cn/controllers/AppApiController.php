@@ -140,7 +140,7 @@ class AppApiController extends ApiController {
             $num = $model->getUserPackageNum($v['catId'],$uid);
             $package[$k]['userWords'] = $num;
             $sign = Category::find()->where("id={$v['catId']}")->one();
-            $package[$k]['userWords'] = $sign->name;
+            $package[$k]['name'] = $sign->name;
         }
         die(json_encode(['package' => $package]));
     }
@@ -195,7 +195,7 @@ class AppApiController extends ApiController {
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
-        $sign = User::find($uid);
+        $sign = User::findOne($uid);
         $packageId = Yii::$app->request->post('packageId');
         $sign1 = UserPackage::find()->where("catId=$packageId AND uid=$uid")->one();
         if($sign1){

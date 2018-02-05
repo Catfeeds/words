@@ -31,6 +31,8 @@ class AppApiController extends ApiController {
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
         $re = User::find()->asArray()->where("uid=$uid")->one();
+        $sign = UserPackage::find()->asArray()->where("catId={$re['nowPackage']} AND uid=$uid")->one();
+        $re['planWords'] = $sign['planWords'];
         if($re){
             $re = [
                 'code' => 1,

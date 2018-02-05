@@ -18,6 +18,9 @@ use yii;
 
 class AppApiController extends ApiController {
     public $enableCsrfValidation = false;
+
+
+
     /**
      * 获取用户资料
      * @Obelisk
@@ -41,6 +44,30 @@ class AppApiController extends ApiController {
             ];
         }
         die(json_encode($re));
+
+    }
+
+    /**
+     * 背单词首页
+     * @Obelisk
+     */
+    public function actionIndex(){
+        $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $re = User::find()->asArray()->where("uid=$uid")->one();
+        $model = new UserWords();
+        $insistDay = $model->insistDay($uid);
+        $userPackageWords = $model->getUserPackageNum($re['nowPackage'],$uid);
+        $userPackage = UserPackage::find()->asArray()->where("uid=$uid AND catId={$re['nowPackage']}")->one();
+        $surplusDay = $model->surplusDay($re['nowPackage'],$userPackageWords,$userPackage['planWords']);
+        $userAllWords = UserWords::find()->where("uid=$uid")->count();
+        $day = date("Y-m-d");
+        $toDayWords = UserWords::find()->where("uid=$uid AND createDay=$day")->count();
+        $userReviewWords = UserWords::find()->where("uid=$uid AND reviewDay=$day")->count();
+        $userNeedReviewWords = UserWords::find()->where("uid=$uid AND type=1")->count();
+        die(json_encode(['insistDay' => $insistDay,'userPackageWords' => $userPackageWords,'userPackage' => $userPackage,'surplusDay' => $surplusDay,'userAllWords' => $userAllWords,'toDayWords' => $toDayWords,'userReviewWords' => $userReviewWords,'userNeedReviewWords' => $userNeedReviewWords]));
 
     }
 
@@ -92,6 +119,7 @@ class AppApiController extends ApiController {
                 User::updateAll(['nickname' => "$nickname"],"uid=$uid");
             }
         }
+        $this->first($uid);
         $session->set('uid', $uid);
     }
 
@@ -377,7 +405,32 @@ class AppApiController extends ApiController {
         }
     }
 
-
+    /**
+     * 更新复习单词
+     * @Obelisk
+     */
+    public function first($uid){
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $re = User::find()->asArray()->where("uid=$uid")->one();
+        UserWords::updateAll(['type' => 0],"uid=$uid");
+        $day = date("Y-m-d");
+        $time = strtotime($day);
+        if( $re['studyModel'] == 1){
+            $oneDay = date("Y-m-d",$time-86400);
+            $fourDay = date("Y-m-d",$time-86400*4);
+            $sevenDay = date("Y-m-d",$time-86400*7);
+            $fourteenDay = date("Y-m-d",$time-86400*14);
+            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE (b.createDay=$oneDay OR b.createDay=$fourDay OR b.createDay=$sevenDay OR b.createDay=$fourteenDay) AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
+            Yii::$app->db->createCommand($sql)->execute();
+        }
+        if( $re['studyModel'] == 2){
+            $oneDay = date("Y-m-d",$time-86400);
+            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE b.createDay=$oneDay AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
+            Yii::$app->db->createCommand($sql)->execute();
+        }
+    }
 
 
 

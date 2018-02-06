@@ -292,10 +292,10 @@ class AppApiController extends ApiController {
     public function actionUpdatePackage(){
         $uid = Yii::$app->session->get('uid');
         $data = Yii::$app->request->post('data');
+        $data = json_decode($data,true);
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
-        var_dump($data);die;
         foreach($data as $v){
             UserPackage::updateAll(['planDay'=>$v['planDay'],'planWords'=>$v['planWords']],"id={$v['id']}");
         }

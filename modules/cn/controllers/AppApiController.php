@@ -295,6 +295,7 @@ class AppApiController extends ApiController {
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
+        var_dump($data);die;
         foreach($data as $v){
             UserPackage::updateAll(['planDay'=>$v['planDay'],'planWords'=>$v['planWords']],"id={$v['id']}");
         }

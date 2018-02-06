@@ -292,11 +292,7 @@ class AppApiController extends ApiController {
     public function actionUpdatePackage(){
         $uid = Yii::$app->session->get('uid');
         $data = Yii::$app->request->post('data');
-        var_dump($_GET);
-        var_dump($_POST);
-        var_dump($data);
         $data = json_decode($data,true);
-        var_dump($data);die;
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }

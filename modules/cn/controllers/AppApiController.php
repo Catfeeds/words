@@ -424,12 +424,12 @@ class AppApiController extends ApiController {
             $fourDay = date("Y-m-d",$time-86400*4);
             $sevenDay = date("Y-m-d",$time-86400*7);
             $fourteenDay = date("Y-m-d",$time-86400*14);
-            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE (b.createDay=$oneDay OR b.createDay=$fourDay OR b.createDay=$sevenDay OR b.createDay=$fourteenDay) AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
+            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE (b.createDay='$oneDay' OR b.createDay='$fourDay' OR b.createDay='$sevenDay' OR b.createDay='$fourteenDay') AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
             Yii::$app->db->createCommand($sql)->execute();
         }
         if( $re['studyModel'] == 2){
             $oneDay = date("Y-m-d",$time-86400);
-            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE b.createDay=$oneDay AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
+            $sql = "UPDATE {{%user_words}} b FROM {{%user_words}} b LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE b.createDay='$oneDay' AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
             Yii::$app->db->createCommand($sql)->execute();
         }
     }

@@ -273,6 +273,8 @@ class AppApiController extends ApiController {
             $sign = UserPackage::find()->orderBy('id ASC')->one();
             if($sign){
                 User::updateAll(['nowPackage' => $sign->catId],"uid=$uid");
+            }else{
+                User::updateAll(['nowPackage' => null],"uid=$uid");
             }
         }
         if($re){
@@ -477,6 +479,21 @@ class AppApiController extends ApiController {
             ];
         }
         die(json_encode($re));
+    }
+
+    /**
+     * 用户签到
+     * @Obelisk
+     */
+    public function actionUserSign(){
+        $uid = Yii::$app->session->get('uid');
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $day = date("Y-m");
+        $data = UserSign::find()->asArray()->where("DATE_FORMAT(FROM_UNIXTIME(createDay),’%Y-%m’) = '$day' AND uid=$uid")->all();
+        die(json_encode(['code' => 1,'data' => $data]));
+
     }
 
 

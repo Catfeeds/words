@@ -321,6 +321,10 @@ function uc_user_edit_integral($username,$behavior,$type,$integral) {
     $return = call_user_func(UC_API_FUNC, 'user', 'integral_edit', array('username'=>$username,'behavior' => $behavior,'type' => $type,'integral' => $integral));
     return $return;
 }
+function uc_user_edit_integral1($uid,$behavior,$type,$integral) {
+    $return = call_user_func(UC_API_FUNC, 'user', 'integral_edit1', array('uid'=>$uid,'behavior' => $behavior,'type' => $type,'integral' => $integral));
+    return $return;
+}
 
 function uc_user_synlogin($uid) {
 	$uid = intval($uid);

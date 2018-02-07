@@ -9,6 +9,7 @@ use app\libs\ApiController;
 use app\modules\cn\models\Category;
 use app\modules\cn\models\User;
 use app\modules\cn\models\UserPackage;
+use app\modules\cn\models\UserSign;
 use app\modules\cn\models\UserWords;
 use app\modules\cn\models\Words;
 use app\modules\cn\models\WordsLowSentence;
@@ -17,10 +18,11 @@ use yii;
 
 
 class AppApiController extends ApiController {
+    function init (){
+        parent::init();
+        include_once($_SERVER['DOCUMENT_ROOT'].'/../libs/ucenter/ucenter.php');
+    }
     public $enableCsrfValidation = false;
-
-
-
     /**
      * 获取用户资料
      * @Obelisk
@@ -314,7 +316,7 @@ class AppApiController extends ApiController {
         if(!$uid){
             die(json_encode(['code' => 99,'message' => '未登录']));
         }
-        $sign = User::find($uid);
+        $sign = User::findOne($uid);
         if($sign->studyModel == 1 && $isMemory){
             $re = $this->verifyMemory($uid);
             if($re){
@@ -435,6 +437,46 @@ class AppApiController extends ApiController {
             $sql = "UPDATE {{%user_words}} b  LEFT JOIN {{%words}} a ON a.id = b.wordsId SET b.type=1 WHERE b.createDay='$oneDay' AND a.categoryId={$re['nowPackage']} AND b.uid=$uid";
             Yii::$app->db->createCommand($sql)->execute();
         }
+    }
+
+    /**
+     * 打卡
+     * @Obelisk
+     */
+    public function actionSign(){
+        $uid = Yii::$app->session->get('uid');
+        $day = date("Y-m-d");
+        if(!$uid){
+            die(json_encode(['code' => 99,'message' => '未登录']));
+        }
+        $sign = User::findOne($uid);
+        $lastDay = date("Y-m-d",strtotime("-1 day"));
+        if($lastDay == $sign->lastSign){
+                User::updateAll(['continuousNum' => "`continuousNum`+1"],"uid=$uid");
+        }else{
+            User::updateAll(['continuousNum' => 0],"uid=$uid");
+        }
+        User::updateAll(['lastSign' => $day],"uid=$uid");
+        $model = new UserSign();
+        $model->uid = $uid;
+        $model->createDay = $day;
+        $re = $model->save();
+        if($re){
+            $sign = User::findOne($uid);
+            $num = $sign->continuousNum;
+            $num = 10+5*$num;
+            uc_user_edit_integral($uid,'单词签到',1,$num);
+            $re = [
+                'code' => 1,
+                'message' => '打卡成功'
+            ];
+        }else{
+            $re = [
+                'code' => 0,
+                'message' => '打卡失败'
+            ];
+        }
+        die(json_encode($re));
     }
 
 

@@ -69,7 +69,8 @@ class AppApiController extends ApiController {
         $toDayWords = UserWords::find()->where("uid=$uid AND createDay=$day")->count();
         $userReviewWords = UserWords::find()->where("uid=$uid AND reviewDay=$day")->count();
         $userNeedReviewWords = UserWords::find()->where("uid=$uid AND type=1")->count();
-        die(json_encode(['insistDay' => $insistDay,'userPackageWords' => $userPackageWords,'userPackage' => $userPackage,'surplusDay' => $surplusDay,'userAllWords' => $userAllWords,'toDayWords' => $toDayWords,'userReviewWords' => $userReviewWords,'userNeedReviewWords' => $userNeedReviewWords]));
+        $allWords = Words::find()->where("categoryId={$re['nowPackage']}")->count();
+        die(json_encode(['allWords' => $allWords,'insistDay' => $insistDay,'userPackageWords' => $userPackageWords,'userPackage' => $userPackage,'surplusDay' => $surplusDay,'userAllWords' => $userAllWords,'toDayWords' => $toDayWords,'userReviewWords' => $userReviewWords,'userNeedReviewWords' => $userNeedReviewWords]));
 
     }
 

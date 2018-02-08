@@ -467,7 +467,7 @@ class AppApiController extends ApiController {
             $sign = User::findOne($uid);
             $num = $sign->continuousNum;
             $num = 10+5*$num;
-            uc_user_edit_integral($uid,'单词签到',1,$num);
+            uc_user_edit_integral1($uid,'单词签到',1,$num);
             $re = [
                 'code' => 1,
                 'message' => '打卡成功'
@@ -492,7 +492,9 @@ class AppApiController extends ApiController {
         }
         $day = date("Y-m");
         $data = UserSign::find()->asArray()->where("DATE_FORMAT(createDay,'%Y-%m') = '$day' AND uid=$uid")->all();
-        die(json_encode(['code' => 1,'data' => $data]));
+        $num = UserSign::find()->where("uid=$uid")->count();
+        $integral = uc_user_integral1($uid);
+        die(json_encode(['code' => 1,'data' => $data,'integral' => $integral['integral'],'num' => $num]));
 
     }
 

@@ -312,7 +312,7 @@ function uc_user_integral($username,$limit="",$where="") {
     return uc_unserialize($return);
 }
 
-function uc_user_integral1($uid,$limit="",$where="") {
+function uc_user_integral1($uid,$limit="limit 0,10",$where="") {
 	$return = call_user_func(UC_API_FUNC, 'user', 'get_integral1', array('where'=>$where,'uid'=>$uid,'limit' => $limit));
 	return uc_unserialize($return);
 }

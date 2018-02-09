@@ -377,9 +377,9 @@ class AppApiController extends ApiController {
             $model->createDay = $day;
             $model->updateDay = $day;
             if($status == 1){
-                $model->isKonw = 1;
+                $model->isKnow = 1;
             }else{
-                $model->isKonw = 0;
+                $model->isKnow = 0;
             }
             $re = $model->save();
 
